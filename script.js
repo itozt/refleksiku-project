@@ -9,11 +9,29 @@ const searchButton = document.getElementById('searchButton');
 const searchDateInput = document.getElementById('searchDate');
 const resultDisplay = document.getElementById('resultDisplay');
 
+// ==========================================================
+// FUNGSI UTILITY: Mengubah format YYYY-MM-DD menjadi DD Bulan YYYY
+// ==========================================================
+function formatDateToIndonesian(isoDate) {
+    if (!isoDate) return '';
+    const dateParts = isoDate.split('-'); // Contoh: ['2025', '07', '09']
+    const year = dateParts[0];
+    const monthIndex = parseInt(dateParts[1]) - 1; // Bulan 0-based
+    const day = dateParts[2];
+    
+    const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // Hasilnya: '09 Juli 2025'
+    return `${day} ${monthNames[monthIndex]} ${year}`;
+}
+
 
 // ==========================================================
-// 1. LOGIKA PENGIRIMAN FORM (doPost) - Tetap pakai no-cors
+// 1. LOGIKA PENGIRIMAN FORM (doPost)
 // ==========================================================
-
 form.addEventListener('submit', function(e) {
     e.preventDefault(); 
 
@@ -22,21 +40,27 @@ form.addEventListener('submit', function(e) {
 
     const formData = new FormData(form);
     
+    // LANGKAH PENTING: FORMAT TANGGAL SEBELUM DIKIRIM
+    const isoDate = formData.get('Tanggal'); 
+    const formattedDate = formatDateToIndonesian(isoDate); 
+    
+    // GANTI nilai 'Tanggal' di form data dengan string teks yang sudah diformat
+    formData.set('Tanggal', formattedDate); 
+
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: formData,
-        mode: 'no-cors' // Dipertahankan untuk stabilitas POST
+        mode: 'no-cors' 
     })
     .then(() => {
-        // Asumsi sukses setelah pengiriman
         alert('✅ Refleksi berhasil disimpan ke Google Sheets!');
         form.reset();
+        simpanButton.disabled = false;
+        simpanButton.textContent = '✅ Simpan Refleksi';
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('❌ Terjadi kegagalan koneksi jaringan.');
-    })
-    .finally(() => {
+        alert('❌ Terjadi kesalahan saat menyimpan data. (Cek Network/URL)');
         simpanButton.disabled = false;
         simpanButton.textContent = '✅ Simpan Refleksi';
     });
@@ -44,58 +68,14 @@ form.addEventListener('submit', function(e) {
 
 
 // ==========================================================
-// 2. LOGIKA PENCARIAN TANGGAL (doGet) - Kembalikan ke Fetch Standar
+// 2. LOGIKA PENCARIAN (doGet)
 // ==========================================================
-
-// Ganti seluruh searchButton.addEventListener Anda dengan kode ini:
-
-searchButton.addEventListener('click', function() {
-    const date = searchDateInput.value;
-    if (!date) {
-        alert('Mohon pilih tanggal yang ingin dicari.');
-        return;
-    }
-    
-    resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal <strong>${date}</strong>...</p>`;
-    searchButton.disabled = true;
-
-    // Tambahkan cacheBuster untuk memastikan browser memuat ulang
-    const cacheBuster = new Date().getTime();
-    const fetchUrl = `${SCRIPT_URL}?searchDate=${date}&cacheBuster=${cacheBuster}`;
-
-    // Gunakan Fetch API standar yang mengandalkan CORS Apps Script
-    fetch(fetchUrl)
-    .then(response => {
-        if (!response.ok) {
-            // Jika status HTTP 400 atau 500, lemparkan error
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.result === 'success') {
-            displayResults(data.headers, data.data);
-        } else {
-            // Tampilkan pesan error dari Apps Script (atau 'not found')
-            resultDisplay.innerHTML = `<p style="color: red;">❌ ${data.message || 'Tidak ditemukan refleksi.'}</p>`;
-        }
-    })
-    .catch(error => {
-        // Blok ini menangani masalah jaringan atau kegagalan parsing JSON
-        console.error('Error fetching data:', error);
-        resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (Cek Koneksi atau Console Browser)</p>';
-    })
-    .finally(() => {
-        // Blok ini dijamin berjalan SETELAH SUKSES atau GAGAL
-        searchButton.disabled = false;
-    });
-});
-
 function displayResults(headers, data) {
-    // Memformat hasil data yang diterima dari Apps Script
+    // ... (Fungsi ini tetap sama untuk menampilkan hasil) ...
     let html = '<table class="result-table">';
     
     for (let i = 0; i < headers.length; i++) {
+        // Abaikan header (Kolom 0) karena sudah ditampilkan di judul hasil
         if (i === 0) continue; 
 
         let title = headers[i].replace(/_/g, ' '); 
@@ -104,15 +84,56 @@ function displayResults(headers, data) {
         html += `
             <tr>
                 <td class="result-title">${title}</td>
-                <td>:</td>
-                <td class="result-content">${content}</td>
+                <td>${content}</td>
             </tr>
         `;
     }
     html += '</table>';
     
+    // Menambahkan tanggal yang dicari di atas tabel
+    html = `<h3>Refleksi Tanggal ${data[0]}</h3>` + html;
+
     resultDisplay.innerHTML = html;
 }
 
+searchButton.addEventListener('click', function() {
+    const isoDate = searchDateInput.value;
+    if (!isoDate) {
+        alert('Mohon pilih tanggal yang ingin dicari.');
+        return;
+    }
+    
+    // LANGKAH PENTING: FORMAT TANGGAL SEBELUM DIKIRIM SEBAGAI PARAMETER PENCARIAN
+    const searchDateText = formatDateToIndonesian(isoDate);
 
+    resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal <strong>${searchDateText}</strong>...</p>`;
+    searchButton.disabled = true;
 
+    // Kirim tanggal yang sudah diformat ke Apps Script
+    const fetchUrl = `${SCRIPT_URL}?searchDate=${encodeURIComponent(searchDateText)}`;
+
+    // Menggunakan Fetch API untuk GET
+    fetch(fetchUrl)
+    .then(response => {
+        // Apps Script mengembalikan JSON dengan header X-Content-Type-Options: nosniff
+        // Kita harus memastikan respons OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        searchButton.disabled = false;
+        if (data.result === 'success') {
+            displayResults(data.headers, data.data);
+        } else {
+            // Tampilkan pesan error dari Apps Script (atau 'not found')
+            resultDisplay.innerHTML = `<p style="color: red;">❌ ${data.message || 'Tidak ditemukan refleksi.'}</p>`;
+        }
+    })
+    .catch(error => {
+        searchButton.disabled = false;
+        console.error('Error fetching data:', error);
+        resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (CORS atau Network Error)</p>';
+    });
+});

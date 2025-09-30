@@ -1,5 +1,5 @@
 // VARIABEL PENTING: Gunakan URL Apps Script Anda yang sudah benar
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynpx-p8Cy1IPN-sRLR7P2g1c-KIzl7UZkY8VIyTUcAzaU6HJf6P0oTVuLz8tBNMhkh/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbww4d-v_-QkxoJ9z49cJkMBvUx-KUs5Fx5WWb7KA9dBnh8DqMIOb1HUN-QSfq8eWkYi/exec'; 
 
 const form = document.getElementById('reflectionForm');
 const simpanButton = form.querySelector('button[type="submit"]');
@@ -9,28 +9,9 @@ const searchButton = document.getElementById('searchButton');
 const searchDateInput = document.getElementById('searchDate');
 const resultDisplay = document.getElementById('resultDisplay');
 
-// ==========================================================
-// FUNGSI UTILITY: Mengubah format YYYY-MM-DD menjadi DD Bulan YYYY
-// ==========================================================
-function formatDateToIndonesian(isoDate) {
-    if (!isoDate) return '';
-    const dateParts = isoDate.split('-'); // Contoh: ['2025', '07', '09']
-    const year = dateParts[0];
-    const monthIndex = parseInt(dateParts[1]) - 1; // Bulan 0-based
-    const day = dateParts[2];
-    
-    const monthNames = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-
-    // Hasilnya: '09 Juli 2025'
-    return `${day} ${monthNames[monthIndex]} ${year}`;
-}
-
 
 // ==========================================================
-// 1. LOGIKA PENGIRIMAN FORM (doPost)
+// 1. LOGIKA PENGIRIMAN FORM (doPost) - Kirim ISO Mentah
 // ==========================================================
 form.addEventListener('submit', function(e) {
     e.preventDefault(); 
@@ -40,12 +21,8 @@ form.addEventListener('submit', function(e) {
 
     const formData = new FormData(form);
     
-    // LANGKAH PENTING: FORMAT TANGGAL SEBELUM DIKIRIM
-    const isoDate = formData.get('Tanggal'); 
-    const formattedDate = formatDateToIndonesian(isoDate); 
-    
-    // GANTI nilai 'Tanggal' di form data dengan string teks yang sudah diformat
-    formData.set('Tanggal', formattedDate); 
+    // TIDAK PERLU FORMAT DI SINI. Biarkan Apps Script yang memformat.
+    // data.Tanggal adalah string YYYY-MM-DD mentah.
 
     fetch(SCRIPT_URL, {
         method: 'POST',
@@ -68,7 +45,7 @@ form.addEventListener('submit', function(e) {
 
 
 // ==========================================================
-// 2. LOGIKA PENCARIAN (doGet)
+// 2. LOGIKA PENCARIAN (doGet) - Kirim ISO Mentah untuk Dicari
 // ==========================================================
 function displayResults(headers, data) {
     let html = '<table class="result-table">';
@@ -88,27 +65,25 @@ function displayResults(headers, data) {
     }
     html += '</table>';
     
-    // Menampilkan tanggal yang dicari di atas tabel
-    html = `<h3>Refleksi Tanggal ${data[0]}</h3>` + html; // data[0] sudah berisi string DD Bulan YYYY
+    // Data[0] sudah diformat di Apps Script, jadi tampilkan langsung
+    html = `<h3>Refleksi Tanggal ${data[0]}</h3>` + html;
 
     resultDisplay.innerHTML = html;
 }
 
 searchButton.addEventListener('click', function() {
-    const isoDate = searchDateInput.value; // Ambil YYYY-MM-DD
-    if (!isoDate) {
+    const searchDateISO = searchDateInput.value; // Kirim YYYY-MM-DD mentah
+    if (!searchDateISO) {
         alert('Mohon pilih tanggal yang ingin dicari.');
         return;
     }
     
-    // LANGKAH PENTING: FORMAT TANGGAL SEBELUM DIKIRIM SEBAGAI PARAMETER PENCARIAN
-    const searchDateText = formatDateToIndonesian(isoDate);
-
-    resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal <strong>${searchDateText}</strong>...</p>`;
+    // Tampilkan pesan loading dengan format yang benar (Anda bisa membuat fungsi display terpisah jika mau)
+    resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal ${searchDateISO}...</p>`; 
     searchButton.disabled = true;
 
-    // Kirim tanggal string teks yang sudah diformat ke Apps Script
-    const fetchUrl = `${SCRIPT_URL}?searchDate=${encodeURIComponent(searchDateText)}`;
+    // Kirim permintaan GET dengan string YYYY-MM-DD mentah
+    const fetchUrl = `${SCRIPT_URL}?searchDate=${encodeURIComponent(searchDateISO)}`;
 
     fetch(fetchUrl)
     .then(response => {

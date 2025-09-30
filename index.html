@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refleksiku - Jurnal Harian</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <h1>Refleksiku</h1>
+    
+    <form id="reflectionForm">
+        <label for="Tanggal">📅 Tanggal Refleksi:</label>
+        <input type="date" id="Tanggal" name="Tanggal" required>
+
+        <hr>
+        
+        <h2>1. Apa yang kamu lakukan sepanjang hari ini?</h2>
+        
+        <label for="Aktivitas_Pagi">Pagi</label>
+        <textarea id="Aktivitas_Pagi" name="Aktivitas_Pagi" rows="3" required></textarea>
+
+        <label for="Aktivitas_Siang">Siang</label>
+        <textarea id="Aktivitas_Siang" name="Aktivitas_Siang" rows="3" required></textarea>
+
+        <label for="Aktivitas_Sore">Sore</label>
+        <textarea id="Aktivitas_Sore" name="Aktivitas_Sore" rows="3" required></textarea>
+
+        <label for="Aktivitas_Malam">Malam</label>
+        <textarea id="Aktivitas_Malam" name="Aktivitas_Malam" rows="3" required></textarea>
+        
+        <hr>
+
+        <h2>2. Hal baik apa yang kamu lakukan sepanjang hari ini?</h2>
+        <textarea id="Hal_Baik" name="Hal_Baik" rows="5" required></textarea>
+        
+        <h2>3. Pada saat apa kamu merasakan kehadiran Tuhan di hari ini?</h2>
+        <textarea id="Kehadiran_Tuhan" name="Kehadiran_Tuhan" rows="5" required></textarea>
+
+        <h2>4. Hal baik apa yang ingin kamu lakukan di hari besok?</h2>
+        <textarea id="Rencana_Besok" name="Rencana_Besok" rows="5" required></textarea>
+
+        <hr>
+
+        <button type="submit">✅ Simpan Refleksi</button>
+
+    </form>
+    
+    <hr>
+    
+    <section id="reflectionViewer">
+        <h2>🗓️ Lihat Refleksi Lama</h2>
+        
+        <div class="search-controls">
+            <label for="searchDate">Pilih Tanggal Refleksi:</label>
+            <input type="date" id="searchDate">
+            <button id="searchButton" type="button">Cari Refleksi</button>
+        </div>
+
+        <hr>
+
+        <h3>Hasil Refleksi Harian</h3>
+        <div id="resultDisplay">
+            <p>Pilih tanggal di atas untuk melihat refleksi.</p>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

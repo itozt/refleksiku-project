@@ -1,5 +1,5 @@
 // VARIABEL PENTING: Gunakan URL Apps Script Anda yang sudah benar
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw-ym99DggXSCNkK8tMDmdTUCXkTYYGFy8NogQ0332agIOm6nw7Jyk_oeP56-LUKZpi/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynpx-p8Cy1IPN-sRLR7P2g1c-KIzl7UZkY8VIyTUcAzaU6HJf6P0oTVuLz8tBNMhkh/exec'; 
 
 const form = document.getElementById('reflectionForm');
 const simpanButton = form.querySelector('button[type="submit"]');
@@ -131,4 +131,5 @@ searchButton.addEventListener('click', function() {
         resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (CORS atau Network Error)</p>';
     });
 });
+
 

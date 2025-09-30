@@ -1,163 +1,463 @@
-/* Styling Dasar */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+/* Reset & Base Styles */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: linear-gradient(135deg, #1a1410 0%, #2d2418 50%, #1a1410 100%);
+    min-height: 100vh;
     padding: 20px;
-    display: flex; /* Untuk memudahkan penempatan formulir */
-    flex-direction: column;
-    align-items: center;
+    position: relative;
+    color: #e8d5b7;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139, 90, 43, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #d4af37;
+    animation: fadeInDown 1s ease;
 }
 
 h1 {
-    color: #2c3e50;
-    text-align: center;
+    font-size: 3em;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 8px rgba(212, 175, 55, 0.5);
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #d4af37;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    opacity: 0.9;
+    color: #c9a961;
+    letter-spacing: 1px;
+}
+
+.cross-divider {
+    font-size: 2em;
+    margin: 20px 0;
+    opacity: 0.8;
+}
+
+/* Bible Verse Card */
+.bible-verse {
+    background: rgba(45, 36, 24, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
     margin-bottom: 30px;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 1.5s ease;
 }
 
-/* Penataan Formulir & Viewer */
-#reflectionForm, #reflectionViewer {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px; /* Batasan lebar agar tidak terlalu besar di desktop */
-    margin-bottom: 30px; /* Jarak antar formulir dan viewer */
+.bible-verse p {
+    color: #e8d5b7;
+    font-style: italic;
+    font-size: 1.1em;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
-/* Styling Input & Textarea */
-label {
-    display: block; 
-    margin-top: 15px;
-    margin-bottom: 5px;
+.bible-verse cite {
+    display: block;
+    text-align: right;
+    color: #d4af37;
+    font-size: 0.95em;
     font-weight: bold;
-    color: #34495e;
 }
 
+/* Form & Viewer Sections */
+#reflectionForm, 
+#reflectionViewer {
+    background: linear-gradient(145deg, #2d2419 0%, #3d3020 100%);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 
+        0 15px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(212, 175, 55, 0.1);
+    margin-bottom: 40px;
+    border: 2px solid rgba(139, 90, 43, 0.3);
+    animation: fadeInUp 1s ease;
+}
+
+/* Headings */
+h2 {
+    color: #d4af37;
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+h2::before {
+    content: '✝';
+    color: #c9a961;
+    font-size: 1.2em;
+}
+
+.viewer-title {
+    margin-bottom: 25px;
+}
+
+/* Form Labels */
+label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: #c9a961;
+    font-weight: 600;
+    font-size: 1em;
+}
+
+/* Input & Textarea */
 input[type="date"], 
 textarea {
-    width: 100%; 
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box; 
-    font-size: 16px;
-    resize: vertical; 
-}
-
-/* --- Gaya Baru untuk Pencarian --- */
-.search-controls {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end; /* Memastikan input dan tombol sejajar */
-}
-
-#searchDate {
-    flex-grow: 1; /* Input tanggal mengambil sisa lebar */
-    min-width: 150px;
-    margin-bottom: 0; /* Hapus margin bawah default */
-}
-
-#searchButton {
-    padding: 10px 15px;
-    background-color: #3498db; /* Warna biru untuk tombol cari */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    height: 40px; /* Sesuaikan tinggi dengan input */
-}
-
-#searchButton:hover {
-    background-color: #2980b9;
-}
-
-/* --- Gaya Hasil Pencarian --- */
-#resultDisplay {
-    margin-top: 15px;
+    width: 100%;
     padding: 15px;
-    border: 1px dashed #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    border: 2px solid #5a4a35;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: 'Georgia', serif;
+    transition: all 0.3s ease;
+    background: #1a1410;
+    color: #e8d5b7;
 }
 
-.result-table {
-    width: 100%;
-    border-collapse: collapse;
+input[type="date"]:focus, 
+textarea:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    background: #2d2418;
 }
 
-.result-title {
-    font-weight: bold;
-    vertical-align: top;
-    padding: 5px 0;
-    width: 35%;
-    color: #2c3e50;
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
 }
 
-.result-content {
-    vertical-align: top;
-    padding: 5px 0;
-    white-space: pre-wrap; /* Mempertahankan format baris baru dari textarea */
-}
-
-/* Styling Tombol Simpan */
-button[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background-color: #2ecc71; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
+/* Date Input Color Fix */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(3) hue-rotate(10deg);
     cursor: pointer;
-    transition: background-color 0.3s;
+}
+
+/* Horizontal Rules */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(139, 90, 43, 0.5), transparent);
+    margin: 35px 0;
+}
+
+.section-divider {
+    margin: 50px 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #8b5a2b, transparent);
+}
+
+/* Submit Button */
+button[type="submit"] {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
+    color: #1a1410;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 button[type="submit"]:hover {
-    background-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
+    background: linear-gradient(135deg, #e8c456 0%, #d4af37 100%);
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background-color: #bdc3c7;
-    margin: 25px 0;
+button[type="submit"]:active {
+    transform: translateY(0);
 }
 
-/* --- Media Query untuk Tampilan Mobile --- */
-@media (max-width: 600px) {
-    #reflectionForm, #reflectionViewer {
-        width: 100%;
-        max-width: none; 
-        padding: 15px; 
-        box-shadow: none; 
+button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Search Controls */
+.search-controls {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.search-controls label {
+    margin: 0 0 8px 0;
+}
+
+.search-field {
+    flex: 1;
+}
+
+#searchButton {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #8b5a2b 0%, #6d4621 100%);
+    color: #e8d5b7;
+    border: 2px solid #5a4a35;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#searchButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 90, 43, 0.5);
+    background: linear-gradient(135deg, #a06a35 0%, #8b5a2b 100%);
+    border-color: #d4af37;
+}
+
+#searchButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Result Display */
+#resultDisplay {
+    margin-top: 25px;
+    padding: 25px;
+    background: linear-gradient(135deg, #1a1410 0%, #2d2418 100%);
+    border-radius: 15px;
+    border: 2px solid #5a4a35;
+    min-height: 100px;
+}
+
+#resultDisplay p {
+    color: #c9a961;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Result Table */
+.result-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+}
+
+.result-table tr {
+    background: #2d2418;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.result-title {
+    font-weight: 600;
+    color: #d4af37;
+    padding: 15px;
+    vertical-align: top;
+    width: 35%;
+    background: rgba(139, 90, 43, 0.2);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.result-content {
+    padding: 15px;
+    vertical-align: top;
+    white-space: pre-wrap;
+    color: #e8d5b7;
+    line-height: 1.6;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.result-table td:nth-child(2) {
+    padding: 15px 8px;
+    color: #d4af37;
+    font-weight: bold;
+    background: #2d2418;
+}
+
+/* View Data Button */
+#viewDataButton {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 40px auto;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #8b5a2b 0%, #6d4621 100%);
+    color: #e8d5b7;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border: 2px solid #5a4a35;
+}
+
+#viewDataButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 90, 43, 0.6);
+    background: linear-gradient(135deg, #a06a35 0%, #8b5a2b 100%);
+    border-color: #d4af37;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    color: #c9a961;
+    margin-top: 40px;
+    padding: 20px;
+    font-size: 0.9em;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
     body {
         padding: 10px;
     }
-    
-    button[type="submit"] {
-        font-size: 16px;
+
+    h1 {
+        font-size: 2em;
     }
-    
+
+    #reflectionForm, 
+    #reflectionViewer {
+        padding: 25px;
+        border-radius: 15px;
+    }
+
     .search-controls {
-        flex-direction: column; /* Ubah tata letak menjadi vertikal */
-        gap: 0;
+        flex-direction: column;
+        align-items: stretch;
     }
-    
-    #searchDate {
+
+    .search-field {
         width: 100%;
-        margin-bottom: 10px;
     }
-    
+
     #searchButton {
         width: 100%;
+    }
+
+    .bible-verse {
+        padding: 20px;
+    }
+
+    .bible-verse p {
+        font-size: 1em;
+    }
+
+    .result-title {
+        width: 40%;
+        font-size: 0.9em;
+    }
+
+    .result-content {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.6em;
+        letter-spacing: 2px;
+    }
+
+    #reflectionForm, 
+    #reflectionViewer {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    .result-table {
+        border-spacing: 0 10px;
+    }
+
+    .result-title, 
+    .result-content, 
+    .result-table td:nth-child(2) {
+        padding: 10px;
+        font-size: 0.85em;
     }
 }

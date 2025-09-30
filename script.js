@@ -1,14 +1,18 @@
-// VARIABEL PENTING: Ganti nilai ini!
-// Ini adalah URL yang akan Anda dapatkan setelah membuat Google Apps Script (Langkah berikutnya)
+// VARIABEL PENTING: Gunakan URL Apps Script Anda yang sudah benar
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_wWxA3cwbn1kZR8ZSPJGhtoKvJuTMxrARWOe5DL3hQEiv_heSxS0OM6nHWyZQa40jAw/exec'; 
 
 const form = document.getElementById('reflectionForm');
 const simpanButton = form.querySelector('button[type="submit"]');
 
-// Elemen baru untuk fitur pencarian
+// Elemen untuk fitur pencarian
 const searchButton = document.getElementById('searchButton');
 const searchDateInput = document.getElementById('searchDate');
 const resultDisplay = document.getElementById('resultDisplay');
+
+
+// ==========================================================
+// 1. LOGIKA PENGIRIMAN FORM (doPost) - Tetap pakai no-cors
+// ==========================================================
 
 form.addEventListener('submit', function(e) {
     e.preventDefault(); 
@@ -21,16 +25,16 @@ form.addEventListener('submit', function(e) {
     fetch(SCRIPT_URL, {
         method: 'POST',
         body: formData,
-        mode: 'no-cors' // Penting untuk testing di localhost
+        mode: 'no-cors' // Dipertahankan untuk stabilitas POST
     })
     .then(() => {
-        // Asumsi sukses karena 'no-cors' mencegah pengecekan respons
+        // Asumsi sukses setelah pengiriman
         alert('✅ Refleksi berhasil disimpan ke Google Sheets!');
         form.reset();
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('❌ Terjadi kegagalan koneksi jaringan. Cek browser console.');
+        alert('❌ Terjadi kegagalan koneksi jaringan.');
     })
     .finally(() => {
         simpanButton.disabled = false;
@@ -38,21 +42,10 @@ form.addEventListener('submit', function(e) {
     });
 });
 
-// ... (Bagian POST FORM di atas tetap sama) ...
 
 // ==========================================================
-// 2. LOGIKA PENCARIAN TANGGAL (doGet) - Menggunakan JSONP/CALLBACK
+// 2. LOGIKA PENCARIAN TANGGAL (doGet) - Kembalikan ke Fetch Standar
 // ==========================================================
-
-// Fungsi global untuk menerima respons dari Apps Script
-window.handleSearchResponse = function(data) {
-    searchButton.disabled = false;
-    if (data.result === 'success') {
-        displayResults(data.headers, data.data);
-    } else {
-        resultDisplay.innerHTML = `<p style="color: red;">❌ Tidak ditemukan refleksi untuk tanggal <strong>${searchDateInput.value}</strong>.</p>`;
-    }
-};
 
 searchButton.addEventListener('click', function() {
     const date = searchDateInput.value;
@@ -64,29 +57,53 @@ searchButton.addEventListener('click', function() {
     resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal <strong>${date}</strong>...</p>`;
     searchButton.disabled = true;
 
-    // Tambahkan parameter callback ke URL untuk JSONP
+    // Tambahkan cacheBuster untuk memastikan browser memuat ulang
     const cacheBuster = new Date().getTime();
-    const fetchUrl = `${SCRIPT_URL}?searchDate=${date}&callback=handleSearchResponse&cacheBuster=${cacheBuster}`;
+    const fetchUrl = `${SCRIPT_URL}?searchDate=${date}&cacheBuster=${cacheBuster}`;
 
-    // Kita tidak menggunakan fetch API, tapi kita inject script ke body
-    // Ini adalah cara kerja JSONP
-    const script = document.createElement('script');
-    script.src = fetchUrl;
-    
-    // Menghapus script lama dan menambah script baru
-    const existingScript = document.getElementById('jsonpScript');
-    if (existingScript) existingScript.remove();
-    
-    script.id = 'jsonpScript';
-    document.body.appendChild(script);
-    
-    // Timer untuk menangani jika script gagal dimuat (timeout)
-    setTimeout(() => {
-        if (searchButton.disabled) {
-            searchButton.disabled = false;
-            resultDisplay.innerHTML = '<p style="color: red;">❌ Waktu koneksi habis. Coba lagi.</p>';
+    // Gunakan Fetch API standar yang mengandalkan CORS Apps Script
+    fetch(fetchUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    }, 10000); // 10 detik timeout
+        return response.json();
+    })
+    .then(data => {
+        searchButton.disabled = false;
+        if (data.result === 'success') {
+            displayResults(data.headers, data.data);
+        } else {
+            // Tampilkan pesan error dari Apps Script (atau 'not found')
+            resultDisplay.innerHTML = `<p style="color: red;">❌ ${data.message || 'Tidak ditemukan refleksi.'}</p>`;
+        }
+    })
+    .catch(error => {
+        searchButton.disabled = false;
+        console.error('Error fetching data:', error);
+        resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (CORS atau Network Error)</p>';
+    });
 });
 
-// ... (fungsi displayResults di bawah tetap sama) ...
+function displayResults(headers, data) {
+    // Memformat hasil data yang diterima dari Apps Script
+    let html = '<table class="result-table">';
+    
+    for (let i = 0; i < headers.length; i++) {
+        if (i === 0) continue; 
+
+        let title = headers[i].replace(/_/g, ' '); 
+        let content = data[i];
+
+        html += `
+            <tr>
+                <td class="result-title">${title}</td>
+                <td>:</td>
+                <td class="result-content">${content}</td>
+            </tr>
+        `;
+    }
+    html += '</table>';
+    
+    resultDisplay.innerHTML = html;
+}

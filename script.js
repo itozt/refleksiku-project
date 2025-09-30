@@ -1,5 +1,5 @@
 // VARIABEL PENTING: Gunakan URL Apps Script Anda yang sudah benar
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw-ym99DggXSCNkK8tMDmdTUCXkTYYGFy8NogQ0332agIOm6nw7Jyk_oeP56-LUKZpi/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_wWxA3cwbn1kZR8ZSPJGhtoKvJuTMxrARWOe5DL3hQEiv_heSxS0OM6nHWyZQa40jAw/exec'; 
 
 const form = document.getElementById('reflectionForm');
 const simpanButton = form.querySelector('button[type="submit"]');
@@ -55,12 +55,12 @@ form.addEventListener('submit', function(e) {
     .then(() => {
         alert('✅ Refleksi berhasil disimpan ke Google Sheets!');
         form.reset();
-        simpanButton.disabled = false;
-        simpanButton.textContent = '✅ Simpan Refleksi';
     })
     .catch(error => {
         console.error('Error:', error);
         alert('❌ Terjadi kesalahan saat menyimpan data. (Cek Network/URL)');
+    })
+    .finally(() => {
         simpanButton.disabled = false;
         simpanButton.textContent = '✅ Simpan Refleksi';
     });
@@ -71,11 +71,9 @@ form.addEventListener('submit', function(e) {
 // 2. LOGIKA PENCARIAN (doGet)
 // ==========================================================
 function displayResults(headers, data) {
-    // ... (Fungsi ini tetap sama untuk menampilkan hasil) ...
     let html = '<table class="result-table">';
     
     for (let i = 0; i < headers.length; i++) {
-        // Abaikan header (Kolom 0) karena sudah ditampilkan di judul hasil
         if (i === 0) continue; 
 
         let title = headers[i].replace(/_/g, ' '); 
@@ -90,14 +88,14 @@ function displayResults(headers, data) {
     }
     html += '</table>';
     
-    // Menambahkan tanggal yang dicari di atas tabel
-    html = `<h3>Refleksi Tanggal ${data[0]}</h3>` + html;
+    // Menampilkan tanggal yang dicari di atas tabel
+    html = `<h3>Refleksi Tanggal ${data[0]}</h3>` + html; // data[0] sudah berisi string DD Bulan YYYY
 
     resultDisplay.innerHTML = html;
 }
 
 searchButton.addEventListener('click', function() {
-    const isoDate = searchDateInput.value;
+    const isoDate = searchDateInput.value; // Ambil YYYY-MM-DD
     if (!isoDate) {
         alert('Mohon pilih tanggal yang ingin dicari.');
         return;
@@ -109,14 +107,11 @@ searchButton.addEventListener('click', function() {
     resultDisplay.innerHTML = `<p>⏳ Mencari refleksi untuk tanggal <strong>${searchDateText}</strong>...</p>`;
     searchButton.disabled = true;
 
-    // Kirim tanggal yang sudah diformat ke Apps Script
+    // Kirim tanggal string teks yang sudah diformat ke Apps Script
     const fetchUrl = `${SCRIPT_URL}?searchDate=${encodeURIComponent(searchDateText)}`;
 
-    // Menggunakan Fetch API untuk GET
     fetch(fetchUrl)
     .then(response => {
-        // Apps Script mengembalikan JSON dengan header X-Content-Type-Options: nosniff
-        // Kita harus memastikan respons OK
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -127,7 +122,6 @@ searchButton.addEventListener('click', function() {
         if (data.result === 'success') {
             displayResults(data.headers, data.data);
         } else {
-            // Tampilkan pesan error dari Apps Script (atau 'not found')
             resultDisplay.innerHTML = `<p style="color: red;">❌ ${data.message || 'Tidak ditemukan refleksi.'}</p>`;
         }
     })

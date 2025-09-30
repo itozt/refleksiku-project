@@ -1,5 +1,5 @@
 // VARIABEL PENTING: Gunakan URL Apps Script Anda yang sudah benar
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_wWxA3cwbn1kZR8ZSPJGhtoKvJuTMxrARWOe5DL3hQEiv_heSxS0OM6nHWyZQa40jAw/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLq0Er-xQqWUMNO_KslG8xvDVFQODhSoHMn4irowUS-uN9G2ZUgtQFmn5aRbDWQajqXA/exec'; 
 
 const form = document.getElementById('reflectionForm');
 const simpanButton = form.querySelector('button[type="submit"]');
@@ -113,4 +113,5 @@ function displayResults(headers, data) {
     
     resultDisplay.innerHTML = html;
 }
+
 

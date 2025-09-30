@@ -47,6 +47,8 @@ form.addEventListener('submit', function(e) {
 // 2. LOGIKA PENCARIAN TANGGAL (doGet) - Kembalikan ke Fetch Standar
 // ==========================================================
 
+// Ganti seluruh searchButton.addEventListener Anda dengan kode ini:
+
 searchButton.addEventListener('click', function() {
     const date = searchDateInput.value;
     if (!date) {
@@ -65,12 +67,12 @@ searchButton.addEventListener('click', function() {
     fetch(fetchUrl)
     .then(response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Jika status HTTP 400 atau 500, lemparkan error
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        searchButton.disabled = false;
         if (data.result === 'success') {
             displayResults(data.headers, data.data);
         } else {
@@ -79,9 +81,13 @@ searchButton.addEventListener('click', function() {
         }
     })
     .catch(error => {
-        searchButton.disabled = false;
+        // Blok ini menangani masalah jaringan atau kegagalan parsing JSON
         console.error('Error fetching data:', error);
-        resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (CORS atau Network Error)</p>';
+        resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (Cek Koneksi atau Console Browser)</p>';
+    })
+    .finally(() => {
+        // Blok ini dijamin berjalan SETELAH SUKSES atau GAGAL
+        searchButton.disabled = false;
     });
 });
 
@@ -107,3 +113,4 @@ function displayResults(headers, data) {
     
     resultDisplay.innerHTML = html;
 }
+

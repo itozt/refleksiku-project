@@ -106,3 +106,4 @@ searchButton.addEventListener('click', function() {
         resultDisplay.innerHTML = '<p style="color: red;">❌ Terjadi kesalahan saat mengambil data. (CORS atau Network Error)</p>';
     });
 });
+
